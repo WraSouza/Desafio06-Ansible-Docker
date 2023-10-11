@@ -1,0 +1,35 @@
+- name: Atualizar Servidor
+  apt:
+   upgrade: yes   
+
+- name: Copiando Arquivo Para Servidor Remoto
+  copy:
+    src: /home/ubuntu/script.sh
+    dest: /home/ubuntu/script.sh
+    mode: 0777
+
+- name: Instalando o Docker
+  script:
+      chdir: /home/ubuntu/
+      cmd: /home/ubuntu/script.sh
+
+- name: Criando Diretório
+  file:
+    path: /home/vagrant/Arquivo_Docker/
+    state: directory  
+
+- name: Escrevendo o Arquivo Dockerfile
+  copy:
+    content: "FROM nginx \n
+              EXPOSE 80"
+    dest: /home/vagrant/Arquivo_Docker/Dockerfile
+
+- name: Criando a imagem do NGIX
+  shell:     
+     chdir: /home/vagrant/Arquivo_Docker
+     cmd: docker build -t imagemnginx .
+
+- name: Inicializando o container
+  shell:
+     chdir: /home/vagrant/Arquivo_Docker
+     cmd: sudo docker container run -d -p 8080:80 imagemnginx
